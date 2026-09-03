@@ -78,4 +78,4 @@ def test_Fi(nodmx_psrs, pta_model2a):
 
     Nts = 20
     t0_range = np.linspace(minMJD, maxMJD, Nts)
-    Fi_obj.compute_noise_marginalized_Fi(epochs=t0_range, noisedict=noise_dict, chain=chain, N=10)
+    Fi_obj.compute_noise_marginalized_Fi(epochs=t0_range, noisedict=noise_dict, chain=chain, Nitr=10)

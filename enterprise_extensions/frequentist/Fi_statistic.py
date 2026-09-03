@@ -188,7 +188,7 @@ class FiStat(object):
 
         return fstat
 
-    def compute_noise_marginalized_Fi(self, epochs, noisedict, chain, N=1000):
+    def compute_noise_marginalized_Fi(self, epochs, noisedict, chain, Nitr=1000):
         """
         Computes the Fi-statistic for the noise parameters pulled from N random points in a Bayesian chain posterior
 
@@ -204,14 +204,14 @@ class FiStat(object):
         fi_all = []
 
         print('FeStat made')
-        for ii in range(N):
+        for ii in range(Nitr):
             idx = np.random.randint(0, chain.shape[0])
             setpars = dict(zip(self.param_names, chain[idx, :-4]))
             self.params = setpars
 
             fi_all.append(self.compute_Fi_t0_range(epochs))
             if ii % 10 == 0:
-                print('{} done'.format(ii/N))
+                print('{} done'.format(ii/Nitr))
 
         return fi_all
 
