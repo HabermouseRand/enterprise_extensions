@@ -9,6 +9,7 @@ from enterprise.signals import selections
 
 from enterprise_extensions import blocks as ee_blocks
 
+
 class FiStat(object):
     """
     Class for the Fi-statistic.
@@ -38,8 +39,7 @@ class FiStat(object):
             selection = selections.Selection(selections.by_backend)
             ef = white_signals.MeasurementNoise(efac=efac, log10_t2equad=equad, selection=selection)
             ec = gp_signals.EcorrBasisModel(log10_ecorr=ecorr, selection=selection, name='')
-            rn = ee_blocks.red_noise_block(psd='powerlaw', prior='log-uniform', components=30,
-                                        Tspan=full_tspan, logmin=-20, logmax=-11)
+            rn = ee_blocks.red_noise_block(psd='powerlaw', prior='log-uniform', components=30, Tspan=full_tspan, logmin=-20, logmax=-11)
             tm = gp_signals.TimingModel(use_svd=True)
 
             if include_curn:
@@ -47,9 +47,7 @@ class FiStat(object):
                     gamma = parameter.Uniform(0, 7)
                 else:
                     gamma = gamma_val
-                curn = ee_blocks.common_red_noise_block(psd='powerlaw', prior='log-uniform',
-                                                Tspan=full_tspan, components=15, logmin = -20, logmax=-11,
-                                                gamma_val=gamma, name='gw')
+                curn = ee_blocks.common_red_noise_block(psd='powerlaw', prior='log-uniform', Tspan=full_tspan, components=15, logmin=-20, logmax=-11, gamma_val=gamma, name='gw')
                 s = tm + ef + ec + curn + rn
             else:
                 s = tm + ef + ec + rn
@@ -169,7 +167,6 @@ class FiStat(object):
 
         return fstat_list
 
-
     def compute_maximum_likelihood_Fi(self, epoch, noisedict, chain):
         """
         Computes the Fi-statistic for the noise parameters pulled from the maximum likelihood value in a Bayesian chain posterior
@@ -183,7 +180,7 @@ class FiStat(object):
 
         """
         print('FeStat made')
-        index_of_max = np.argmax(chain[:,-3])  #gets the index of the max likelihood value
+        index_of_max = np.argmax(chain[:, -3])  # gets the index of the max likelihood value
         setpars = dict(zip(self.param_names, chain[index_of_max, :-4]))
         self.params = setpars
 
@@ -213,7 +210,7 @@ class FiStat(object):
             self.params = setpars
 
             fi_all.append(self.compute_Fi_t0_range(epochs))
-            if ii%10 == 0:
+            if ii % 10 == 0:
                 print('{} done'.format(ii/N))
 
         return fi_all
