@@ -10,9 +10,9 @@ import os
 import numpy as np
 import pytest
 
-from enterprise.signals import signal_base, gp_signals, parameter, utils
-from enterprise_extensions import models, blocks, model_utils
+from enterprise_extensions import models
 from enterprise_extensions.frequentist import Fi_statistic as Fi_stat
+from enterprise.pulsar import FeatherPulsar
 
 testdir = os.path.dirname(os.path.abspath(__file__))
 datadir = os.path.join(testdir, 'data')
@@ -70,11 +70,12 @@ def test_Fi(nodmx_psrs, pta_model2a):
     chain = np.zeros((10, len(pta_model2a.params)+4))
     for ii in range(10):
         entry = [par.sample() for par in pta_model2a.params]
-        entry.extend([OS.pta.get_lnlikelihood(entry)-OS.pta.get_lnprior(entry),
-                      OS.pta.get_lnlikelihood(entry),
+        entry.extend([Fi_obj.pta.get_lnlikelihood(entry)-Fi_obj.pta.get_lnprior(entry),
+                      Fi_obj.pta.get_lnlikelihood(entry),
                       0.5, 1])
         chain[ii, :] = np.array(entry)
-    Fi_obj.compute_maximum_likelihood_Fi(epoch = t0_mid, noisedict=noise_dict, chain=chain)
+    Fi_obj.compute_maximum_likelihood_Fi(epoch=t0_mid, noisedict=noise_dict, chain=chain)
 
+    Nts = 20
     t0_range = np.linspace(minMJD, maxMJD, Nts)
-    Fi_obj.compute_noise_marginalized_Fi(epochs = t0_range, noisedict=noise_dict, chain=chain, N=10)
+    Fi_obj.compute_noise_marginalized_Fi(epochs=t0_range, noisedict=noise_dict, chain=chain, N=10)

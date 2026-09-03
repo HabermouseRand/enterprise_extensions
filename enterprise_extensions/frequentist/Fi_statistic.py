@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import scipy.linalg as sl
 
-from enterprise.signals import (gp_signals, parameter, signal_base, utils,
+from enterprise.signals import (gp_signals, parameter, signal_base,
                                 white_signals)
 from enterprise.signals import selections
 
@@ -21,7 +23,7 @@ class FiStat(object):
 
     """
 
-    def __init__(self, psrs, noisedict=None, pta = None, include_curn=True, gamma_val = 13./3.):
+    def __init__(self, psrs, noisedict=None, pta=None, include_curn=True, gamma_val=13./3.):
 
         if pta is None:
             pmaxes = [p.toas.max() for p in psrs]
@@ -37,17 +39,17 @@ class FiStat(object):
             ef = white_signals.MeasurementNoise(efac=efac, log10_t2equad=equad, selection=selection)
             ec = gp_signals.EcorrBasisModel(log10_ecorr=ecorr, selection=selection, name='')
             rn = ee_blocks.red_noise_block(psd='powerlaw', prior='log-uniform', components=30,
-                                        Tspan=full_tspan, logmin=-20, logmax=-11) #, Tspan=None)
+                                        Tspan=full_tspan, logmin=-20, logmax=-11)
             tm = gp_signals.TimingModel(use_svd=True)
 
             if include_curn:
-                if gamma_val == None:
+                if gamma_val is None:
                     gamma = parameter.Uniform(0, 7)
                 else:
                     gamma = gamma_val
                 curn = ee_blocks.common_red_noise_block(psd='powerlaw', prior='log-uniform',
                                                 Tspan=full_tspan, components=15, logmin = -20, logmax=-11,
-                                                 gamma_val=gamma_val, name='gw')
+                                                gamma_val=gamma, name='gw')
                 s = tm + ef + ec + curn + rn
             else:
                 s = tm + ef + ec + rn
@@ -95,8 +97,6 @@ class FiStat(object):
 
         t0_sec = t0*24*3600
 
-        n_psr = len(self.psrs)
-
         fstat = 0
 
         for idx, (psr, Nvec, TNT, phiinv, T) in enumerate(zip(self.psrs, Nvecs, TNTs, phiinvs, Ts)):
@@ -142,8 +142,6 @@ class FiStat(object):
 
         t0_range_sec = t0_range*24*3600
 
-        n_psr = len(self.psrs)
-
         fstat_list = np.zeros((len(t0_range)))
 
         for idx, (psr, Nvec, TNT, phiinv, T) in enumerate(zip(self.psrs, Nvecs, TNTs, phiinvs, Ts)):
@@ -185,7 +183,7 @@ class FiStat(object):
 
         """
         print('FeStat made')
-        index_of_max = np.argmax(chain[:,-3]) #gets the index of the max likelihood value
+        index_of_max = np.argmax(chain[:,-3])  #gets the index of the max likelihood value
         setpars = dict(zip(self.param_names, chain[index_of_max, :-4]))
         self.params = setpars
 
@@ -220,11 +218,11 @@ class FiStat(object):
 
         return fi_all
 
-    def innerProduct_rr(self, x, y, Nmat, Tmat, Sigma, TNx=None, TNy=None, brave=False): #chol_Sigma
+    def innerProduct_rr(self, x, y, Nmat, Tmat, Sigma, TNx=None, TNy=None, brave=False):
         """
         Compute inner product using rank-reduced
         approximations for red noise/jitter
-        Compute: x^T N^{-1} y - x^T N^{-1} T \Sigma^{-1} T^T N^{-1} y
+        Compute: x^T N^{-1} y - x^T N^{-1} T Sigma^{-1} T^T N^{-1} y
 
         :param x: vector timeseries 1
         :param y: vector timeseries 2
@@ -277,7 +275,7 @@ class FiStat(object):
         TtN = np.multiply((1/Nvec)[:, None], T).T
 
         # Put pulsar's autoerrors in a diagonal matrix
-        Ndiag = np.diag(1/Nvec) #._nvec
+        Ndiag = np.diag(1/Nvec)
 
         expval2 = sl.cho_solve(cf, TtN)
 
